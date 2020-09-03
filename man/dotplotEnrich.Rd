@@ -2,7 +2,7 @@
 % Please edit documentation in R/dotplotEnrich.R
 \name{dotplotEnrich}
 \alias{dotplotEnrich}
-\title{Generate unique names of a vector with repeated elements}
+\title{Dotplot representation for enrichment results}
 \usage{
 dotplotEnrich(
   dt,
@@ -60,5 +60,8 @@ dotplotEnrich(
 dotplot
 }
 \description{
-Generate unique names of a vector with repeated elements
+Dotplot representation for enrichment results
+}
+\examples{
+## To be added later
 }

@@ -1,4 +1,4 @@
-#'Generate unique names of a vector with repeated elements
+#'Dotplot representation for enrichment results
 #'
 #'@param dt data.table or data.frame with the enrichment results. See details for necessary information.
 #'@param topn Top \code{n} enriched terms to be plotted
@@ -18,6 +18,7 @@
 #'@param return.plotObj Boolean controlling whether a \code{ggplot2} object should be returned. Default is FALSE.
 #'@return dotplot
 #'@examples
+#'## To be added later
 #'@export
 
 
@@ -66,7 +67,7 @@ dotplotEnrich <- function(
   #-------------------------------------------------------------------------
   if(topn.pref == "q"){
     ids <- dt[order(get(direction),
-                    eval(q),
+                    get(q),
                     -abs(get(dot))),
               head(.SD, topn),
               by = .(get(group),
@@ -74,7 +75,7 @@ dotplotEnrich <- function(
   } else if(topn.pref == "dot"){
     ids <- dt[order(get(direction),
                     -abs(get(dot)),
-                    eval(q),
+                    get(q),
     ),
     head(.SD, topn),
     by = .(get(group),
@@ -83,10 +84,10 @@ dotplotEnrich <- function(
     stop("The order preference (priority) for topn gene can be either 'q' values or absoulte 'dot' sizes")
   }
 
-  ids <- ids[eval(q) < qcut, get(term.id)]
-  datP <- dt[(get(term.id) %in% ids) & (eval(q) < qcut),]
+  ids <- ids[get(q) < qcut, get(term.id)]
+  datP <- dt[(get(term.id) %in% ids) & (get(q) < qcut),]
   #print(datP)
-  datP <- datP[, eval(dot) := parseGeneRatio(get(dot))]
+  datP <- datP[, get(dot) := parseGeneRatio(get(dot))]
 
   #-------------------------------------------------------------------------
   # Hierarchical cluster for dot organization
@@ -129,7 +130,7 @@ dotplotEnrich <- function(
   }else{
     if(plot.by == "direction"){
       p <- ggplot(datP, aes(x = get(group), y = get(term.name))) +
-        geom_point(aes(size = get(dot), color = eval(q))) +
+        geom_point(aes(size = get(dot), color = get(q))) +
         theme_bw(base_size = 12) +
         scale_colour_gradient(limits=c(0, qcut), low="red", high="blue") +
         ylab(NULL) + xlab(NULL) +
