@@ -87,7 +87,7 @@ dotplotEnrich <- function(
   ids <- ids[get(q) < qcut, get(term.id)]
   datP <- dt[(get(term.id) %in% ids) & (get(q) < qcut),]
   #print(datP)
-  datP <- datP[, get(dot) := parseGeneRatio(get(dot))]
+  datP <- datP[, eval(dot) := parseGeneRatio(get(dot))]
 
   #-------------------------------------------------------------------------
   # Hierarchical cluster for dot organization
