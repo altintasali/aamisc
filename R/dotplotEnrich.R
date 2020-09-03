@@ -72,7 +72,7 @@ dotplotEnrich <- function(
               head(.SD, topn),
               by = .(get(group),
                      get(direction))]
-  } else if(topn.pref == "dot"){
+  }else if(topn.pref == "dot"){
     ids <- dt[order(get(direction),
                     -abs(get(dot)),
                     get(q),
@@ -80,7 +80,7 @@ dotplotEnrich <- function(
     head(.SD, topn),
     by = .(get(group),
            get(direction))]
-  } else {
+  }else {
     stop("The order preference (priority) for topn gene can be either 'q' values or absoulte 'dot' sizes")
   }
 
@@ -111,7 +111,7 @@ dotplotEnrich <- function(
     idOrder <- hcMat.final[hcOrder, ] %>% rownames
     idOrder <- lapply(idOrder, function(x){grep(x, datP[,get(term.id)] %>% unlist)}) %>% do.call(c, .)
     datP <- datP[idOrder, ]
-  } else{
+  }else{
     datP <- datP[order(get(direction), get(dot)),]
   }
 
@@ -140,7 +140,7 @@ dotplotEnrich <- function(
         labs(size=dot, colour=q) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
         facet_grid(~get(direction))
-    } else if(plot.by == "group"){
+    }else if(plot.by == "group"){
       p <- ggplot(datP, aes(x = get(direction), y = get(term.name))) +
         geom_point(aes(size = get(dot), color = get(q))) +
         theme_bw(base_size = 12) +
