@@ -1,7 +1,7 @@
 Package: aamisc
 Type: Package
 Title: Miscellaneous R functions by Ali Altintas
-Version: 0.1.0
+Version: 0.1.0.1
 Author: Ali Altintas
 Maintainer: Ali Altintas <altintas.ali@gmail.com>
 Description: Miscellaneous R functions by Ali Altintas
