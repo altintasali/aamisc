@@ -120,7 +120,8 @@ dotplotEnrich <- function(
     datP[, eval(term.name) := factor(datP[,get(term.name)], levels = datP[,get(term.name)] %>% unique %>% rev)]
   }
   datP[, eval(group) := factor(datP[,get(group)], levels = levels(dt[,get(group)]) %>% unique)]
-  #print(datP)
+  datP[, eval(direction) := factor(datP[,get(direction)], levels = levels(dt[,get(direction)]) %>% unique)]
+    #print(datP)
 
   #-------------------------------------------------------------------------
   # Generate plots
@@ -139,7 +140,7 @@ dotplotEnrich <- function(
         scale_size_area() +
         labs(size=dot, colour=q) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-        facet_grid(~get(direction))
+        facet_grid(~get(direction), drop = FALSE)
     }else if(plot.by == "group"){
       p <- ggplot(datP, aes(x = get(direction), y = get(term.name))) +
         geom_point(aes(size = get(dot), color = get(q))) +
@@ -151,7 +152,7 @@ dotplotEnrich <- function(
         scale_size_area() +
         labs(size=dot, colour=q) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-        facet_grid(~get(group))
+        facet_grid(~get(group), drop = FALSE)
     }
 
     print(p)
