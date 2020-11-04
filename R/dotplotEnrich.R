@@ -152,7 +152,7 @@ dotplotEnrich <- function(
         scale_size_area() +
         labs(size=dot, colour=q) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-        facet_grid(~get(group), drop = FALSE)
+        facet_grid(~get(group), drop = FALSE )
     }
 
     print(p)
