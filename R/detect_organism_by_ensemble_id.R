@@ -1,4 +1,4 @@
-#' Title
+#' Get organism information from ENSEMBL ID
 #'
 #' @param ensembl_gene_id Ensemble gene, transcript or protein ID as character (e.g. ENSMUSG00000024411). Currently supports only human, mouse and rat
 #'
@@ -13,6 +13,21 @@
 #'
 #' @examples
 #' detect_organism_by_ensemble_id(ensembl_gene_id = "ENSMUSG00000024411")
+#'
+#' #$org
+#' #[1] "mouse"
+#' #
+#' #$id
+#' #[1] "mmu"
+#' #
+#' #$db
+#' #[1] "org.Mm.eg.db"
+#' #
+#' #$scientific
+#' #[1] "Mus musculus"
+#' #
+#' #$type
+#' #[1] "gene"
 #'
 detect_organism_by_ensemble_id <- function(ensembl_gene_id){
   if(grepl("ENS\\D\\d+", ensembl_gene_id)){

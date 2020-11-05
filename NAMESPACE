@@ -3,6 +3,7 @@
 export(Qvalue)
 export(abbrev)
 export(basenameLevel)
+export(detect_organism_by_ensemble_id)
 export(df2matrix)
 export(dotplotEnrich)
 export(fittedHR)
