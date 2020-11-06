@@ -2,13 +2,13 @@
 #'
 #' @param ensembl_gene_id Ensemble gene, transcript or protein ID as character (e.g. ENSMUSG00000024411). Currently supports only human, mouse and rat
 #'
-#' @return List object (named \code{org}) contanining \n
-#'\begin{itemize}
+#' @return List object (named \code{org}) contanining
+#' \itemize{
 #'    \item \code{$org} organism name (e.g. mouse)
 #'    \item \code{$id} \href{http://www.genome.jp/kegg/catalog/org_list.html}{KEGG ID}  of the organism (e.g. mmu for mouse)
 #'    \item \code{$db} org.db library in R (e.g. org.Mm.eg.db for mouse)
 #'    \item \code{$scientific} Scientific name of the organism (e.g. 'Mus musculus' for mouse)
-#'\end{itemize}
+#' }
 #' @export
 #'
 #' @examples
