@@ -15,8 +15,7 @@
 #'@param term.reverse Logical. Controls the reverse order (y-axis) plotting.
 #'@param plot.by Panels (facet_grids) to divide while plotting. The options are "direction" (default) and "group"
 #'@param pdf.name Generates a pdf file if not \code{NULL}
-#'@param return.plotObj Boolean controlling whether a \code{ggplot2} object should be returned. Default is FALSE.
-#'@return dotplot
+#'@return ggplot2 object for dotplot
 #'@examples
 #'## To be added later
 #'@export
@@ -157,16 +156,13 @@ dotplotEnrich <- function(
         facet_grid(~get(group), drop = FALSE)
     }
 
-    print(p)
     if(!is.null(pdf.name)){
       pdf(pdf.name)
       print(p)
       dev.off()
     }
 
-    if(return.plotObj){
-      return(p)
-    }
+    return(p)
   }
 }
 
