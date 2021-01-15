@@ -6,7 +6,7 @@ Please install `devtools` if you haven't yet.
 ```r
 install.packages("devtools")
 ```
-Then, you basically install the `venneR` package by using:
+Then, you basically install the `aamisc` package by using:
 ```r
 library(devtools)
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
