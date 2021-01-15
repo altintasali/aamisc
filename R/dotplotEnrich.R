@@ -9,9 +9,9 @@
 #'@param group The column name in \code{dt} defining the groups for each enrichment. The contents will be written on x-axis
 #'@param dot The column name in \code{dt} defining the dot sizes. It must be numeric (e.g. 0.07) or character of fractions (e.g. "7/100")
 #'@param dot.cex Positive numeric dot size scaling parameter.
-#'@param q The column name (numeric) in \code{dt} defining the adjusted p-values for the enrichment.
-#'@param ID The column name (numeric) in \code{dt} defining the ID of the enriched term.
-#'@param Description The column name (numeric) in \code{dt} defining the description of the enriched term.
+#'@param qval The column name in \code{dt} defining the adjusted p-values for the enrichment.
+#'@param ID The column name in \code{dt} defining the ID of the enriched term.
+#'@param Description The column name in \code{dt} defining the description of the enriched term.
 #'@param term.reverse Logical. Controls the reverse order (y-axis) plotting.
 #'@param plot.by Panels (facet_grids) to divide while plotting. The options are "direction" (default) and "group"
 #'@param pdf.name Generates a pdf file if not \code{NULL}
@@ -27,14 +27,14 @@
 dotplotEnrich <- function(
   dt,
   topn      = 10,
-  topn.pref = c("q", "dot"), # order q-values or dot sizes first?
+  topn.pref = c("qval", "dot"), # order q-values or dot sizes first?
   qcut      = 0.05,
   nchar     = 60,
   direction = "DEstatus",
   group     = "Condition",
   dot       = "GeneRatio",
   dot.cex   = 1,
-  q         = "p.adjust",
+  qval      = "p.adjust",
   term.id   = "ID",
   term.name = "Description",
   term.reverse = FALSE,
@@ -66,9 +66,9 @@ dotplotEnrich <- function(
   #-------------------------------------------------------------------------
   # Subset the top n terms to be plotted
   #-------------------------------------------------------------------------
-  if(topn.pref == "q"){
+  if(topn.pref == "qval"){
     ids <- dt[order(get(direction),
-                    get(q),
+                    get(qval),
                     -abs(get(dot))),
               head(.SD, topn),
               by = .(get(group),
@@ -76,7 +76,7 @@ dotplotEnrich <- function(
   }else if(topn.pref == "dot"){
     ids <- dt[order(get(direction),
                     -abs(get(dot)),
-                    get(q),
+                    get(qval),
     ),
     head(.SD, topn),
     by = .(get(group),
@@ -85,8 +85,8 @@ dotplotEnrich <- function(
     stop("The order preference (priority) for topn gene can be either 'q' values or absolute 'dot' sizes")
   }
 
-  ids <- ids[get(q) < qcut, get(term.id)]
-  datP <- dt[(get(term.id) %in% ids) & (get(q) < qcut),]
+  ids <- ids[get(qval) < qcut, get(term.id)]
+  datP <- dt[(get(term.id) %in% ids) & (get(qval) < qcut),]
   #print(datP)
   datP <- datP[, eval(dot) := parseGeneRatio(get(dot))]
 
@@ -132,7 +132,7 @@ dotplotEnrich <- function(
   }else{
     if(plot.by == "direction"){
       p <- ggplot(datP, aes(x = get(group), y = get(term.name))) +
-        geom_point(aes(size = get(dot), color = get(q))) +
+        geom_point(aes(size = get(dot), color = get(qval))) +
         theme_bw(base_size = 12) +
         scale_colour_gradient(limits=c(0, qcut), low="red", high="blue") +
         ylab(NULL) + xlab(NULL) +
@@ -144,7 +144,7 @@ dotplotEnrich <- function(
         facet_grid(~get(direction), drop = FALSE)
     }else if(plot.by == "group"){
       p <- ggplot(datP, aes(x = get(direction), y = get(term.name))) +
-        geom_point(aes(size = get(dot), color = get(q))) +
+        geom_point(aes(size = get(dot), color = get(qval))) +
         theme_bw(base_size = 12) +
         scale_colour_gradient(limits=c(0, qcut), low="red", high="blue") +
         ylab(NULL) + xlab(NULL) +
@@ -155,15 +155,15 @@ dotplotEnrich <- function(
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
         facet_grid(~get(group), drop = FALSE)
     }
-
-    if(!is.null(pdf.name)){
-      pdf(pdf.name)
-      print(p)
-      dev.off()
-    }
-
-    return(p)
   }
+
+  if(!is.null(pdf.name)){
+    pdf(pdf.name, useDingbats = FALSE)
+    print(p)
+    dev.off()
+  }
+
+  return(p)
 }
 
 ## Helper functions
