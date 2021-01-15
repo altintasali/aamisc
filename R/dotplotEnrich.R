@@ -172,6 +172,9 @@ dotplotEnrich <- function(
 
 ## Helper functions
 parseGeneRatio <- function(x){lapply(x, function(a){eval(parse(text = a))}) %>% unlist}
+
+parseMath <- function(x){eval(parse(text = x))} # Text to math operations
+
 abbrev <- function(x, n=50){ #x: vector of character, n: maximum character allowed
   x[nchar(x) >= n] <- paste(strtrim(x[nchar(x) >= n], n-3), "...", sep="")
   return(x)
