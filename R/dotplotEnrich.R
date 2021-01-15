@@ -139,7 +139,7 @@ dotplotEnrich <- function(
         scale_x_discrete(drop=FALSE) +
         scale_y_discrete(label=function(x) abbrev(x,nchar)) +
         scale_size_area() +
-        labs(size=dot, colour=q) +
+        labs(size=dot, colour=qval) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
         facet_grid(~get(direction), drop = FALSE)
     }else if(plot.by == "group"){
@@ -151,7 +151,7 @@ dotplotEnrich <- function(
         scale_x_discrete(drop=FALSE) +
         scale_y_discrete(label=function(x) abbrev(x,nchar)) +
         scale_size_area() +
-        labs(size=dot, colour=q) +
+        labs(size=dot, colour=qval) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
         facet_grid(~get(group), drop = FALSE)
     }
