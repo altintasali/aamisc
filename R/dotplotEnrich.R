@@ -48,7 +48,9 @@ dotplotEnrich <- function(
   #-------------------------------------------------------------------------
   dt <- setDT(dt)
   dt[,eval(group)] <- dt[,get(group)] %>% as.factor
+  dt[,eval(direction)] <- dt[,get(direction)] %>% as.factor
   dt[,eval(dot) := parseGeneRatio(get(dot))]
+
   #-------------------------------------------------------------------------
   # Debug variable below
   #-------------------------------------------------------------------------
@@ -81,7 +83,7 @@ dotplotEnrich <- function(
     by = .(get(group),
            get(direction))]
   }else {
-    stop("The order preference (priority) for topn gene can be either 'q' values or absoulte 'dot' sizes")
+    stop("The order preference (priority) for topn gene can be either 'q' values or absolute 'dot' sizes")
   }
 
   ids <- ids[get(q) < qcut, get(term.id)]
