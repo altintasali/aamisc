@@ -7,14 +7,14 @@
 dotplotEnrich(
   dt,
   topn = 10,
-  topn.pref = c("q", "dot"),
+  topn.pref = c("qval", "dot"),
   qcut = 0.05,
   nchar = 60,
   direction = "DEstatus",
   group = "Condition",
   dot = "GeneRatio",
   dot.cex = 1,
-  q = "p.adjust",
+  qval = "p.adjust",
   term.id = "ID",
   term.name = "Description",
   term.reverse = FALSE,
@@ -42,7 +42,7 @@ dotplotEnrich(
 
 \item{dot.cex}{Positive numeric dot size scaling parameter.}
 
-\item{q}{The column name (numeric) in \code{dt} defining the adjusted p-values for the enrichment.}
+\item{qval}{The column name in \code{dt} defining the adjusted p-values for the enrichment.}
 
 \item{term.reverse}{Logical. Controls the reverse order (y-axis) plotting.}
 
@@ -50,14 +50,12 @@ dotplotEnrich(
 
 \item{pdf.name}{Generates a pdf file if not \code{NULL}}
 
-\item{return.plotObj}{Boolean controlling whether a \code{ggplot2} object should be returned. Default is FALSE.}
+\item{ID}{The column name in \code{dt} defining the ID of the enriched term.}
 
-\item{ID}{The column name (numeric) in \code{dt} defining the ID of the enriched term.}
-
-\item{Description}{The column name (numeric) in \code{dt} defining the description of the enriched term.}
+\item{Description}{The column name in \code{dt} defining the description of the enriched term.}
 }
 \value{
-dotplot
+ggplot2 object for dotplot
 }
 \description{
 Dotplot representation for enrichment results

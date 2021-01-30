@@ -13,11 +13,11 @@ moveMeDataTable(data, tomove, where = "last", ba = NULL)
 
 \item{where}{Where to move the column(s)?
 \itemize{
-    \item \code{last} Moves the column to the last (default)
-    \item \code{first} Moves the column to the first
-    \item \code{before} Moves the column before \code{ba}
-    \item \code{after} Moves the column after \code{ba}
-    }}
+\item \code{last} Moves the column to the last (default)
+\item \code{first} Moves the column to the first
+\item \code{before} Moves the column before \code{ba}
+\item \code{after} Moves the column after \code{ba}
+}}
 
 \item{ba}{The column that points "before" or "after" locations used in \code{where}}
 }
