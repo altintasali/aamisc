@@ -139,13 +139,13 @@ rainAmp <- function(x,
 
   # calculate peak times
   message("Calculating real peaks")
-  rainOut[,peak := phase + DeltaT]
+  rainOut[,peak := times[phase/DeltaT]]
   rainOut[,peak := mod(peak, Period)]
   rainOut[peak == 0, peak := Period]
 
   # calculate trough times
   message("Calculating real troughs")
-  rainOut[,trough := phase + peak.shape + DeltaT]
+  rainOut[,trough := peak + peak.shape]
   rainOut[,trough := mod(trough, Period)]
   rainOut[trough == 0, trough := Period]
 
