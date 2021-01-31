@@ -139,7 +139,7 @@ rainAmp <- function(x,
 
   # calculate peak times
   message("Calculating real peaks")
-  rainOut[,peak := times[phase/DeltaT]]
+  rainOut[,peak := ut[phase/DeltaT]]
   rainOut[,peak := mod(peak, Period)]
   rainOut[peak == 0, peak := Period]
 
