@@ -19,8 +19,9 @@ dotplotEnrich(
   term.name = "Description",
   term.reverse = FALSE,
   plot.by = c("direction", "group")[1],
-  pdf.name = NULL,
-  return.plotObj = FALSE
+  onepanel = FALSE,
+  arrows = FALSE,
+  arrow.col = "beige"
 )
 }
 \arguments{
@@ -28,7 +29,7 @@ dotplotEnrich(
 
 \item{topn}{Top \code{n} enriched terms to be plotted}
 
-\item{topn.pref}{The ranking method to identify \code{topn} terms. Can be either \code{q} or \code{dot}.}
+\item{topn.pref}{The ranking method to identify \code{topn} terms. Can be either \code{qval} or \code{dot}. \code{qval} sorts the dots by ascending order (lowest q-value first) and \code{dot} sorts the dots by descending order (e.g. biggest NES/GeneRatio) by absolute values.}
 
 \item{qcut}{The adjusted p-value cutoff for enriched terms.}
 
@@ -48,7 +49,11 @@ dotplotEnrich(
 
 \item{plot.by}{Panels (facet_grids) to divide while plotting. The options are "direction" (default) and "group"}
 
-\item{pdf.name}{Generates a pdf file if not \code{NULL}}
+\item{onepanel}{Logical (default FALSE). If TRUE, removes the multiple panels (no facet_grid)}
+
+\item{arrows}{Logical (default FALSE). Should "direction" arrows be plotted inside dots?}
+
+\item{arrow.col}{Color of the \code{arrows}. Default is "beige".}
 
 \item{ID}{The column name in \code{dt} defining the ID of the enriched term.}
 
@@ -61,5 +66,33 @@ ggplot2 object for dotplot
 Dotplot representation for enrichment results
 }
 \examples{
-## To be added later
+## Read sample data
+dt <- system.file("extdata", "sample_gsea_kegg.tsv", package = "aamisc")
+dat <- sample_read(dt)
+colnames(dat)
+
+## Dotplot with top 5 significant ontology (KEGG) terms
+p <- dotplotEnrich(
+        dt = dat,
+        topn = 5,
+        topn.pref = "dot",
+        qcut = 0.05,
+        nchar = 65,
+        direction = "Direction",
+        group = "Contrast",
+        dot = "NES",
+        dot.cex = 1,
+        qval = "qvalue",
+        term.id = "ID",
+        term.name = "Description",
+        term.reverse = TRUE,
+        plot.by = "direction")
+print(p)
+
+## Saving as PDF file: I recommend using cairo_pdf
+## DO NOT RUN
+cairo_pdf("pretty_enrich_plot.pdf", height = 7, width = 7)
+print(p)
+dev.off()
+
 }
