@@ -7,7 +7,7 @@
 sample_read(file)
 }
 \arguments{
-\item{file}{Full path of the sample file}
+\item{file}{Path of the sample file}
 }
 \value{
 \code{data.table}
