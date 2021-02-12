@@ -2,7 +2,7 @@
 #'
 #'@param dt data.table or data.frame with the enrichment results. See details for necessary information.
 #'@param topn Top \code{n} enriched terms to be plotted
-#'@param topn.pref The ranking method to identify \code{topn} terms. Can be either \code{q} or \code{dot}.
+#'@param topn.pref The ranking method to identify \code{topn} terms. Can be either \code{qval} or \code{dot}. \code{qval} sorts the dots by ascending order (lowest q-value first) and \code{dot} sorts the dots by descending order (e.g. biggest NES/GeneRatio) by absolute values.
 #'@param qcut The adjusted p-value cutoff for enriched terms.
 #'@param nchar Maximum characters to be shown on on y-axis. If the term contains more characters than \code{nchar}, it will be abbreviated with "(...)"
 #'@param direction The column name in \code{dt} defining the direction  (e.g. up, down, all) of the enrichment
@@ -14,15 +14,41 @@
 #'@param Description The column name in \code{dt} defining the description of the enriched term.
 #'@param term.reverse Logical. Controls the reverse order (y-axis) plotting.
 #'@param plot.by Panels (facet_grids) to divide while plotting. The options are "direction" (default) and "group"
-#'@param pdf.name Generates a pdf file if not \code{NULL}
+#'@param onepanel Logical (default FALSE). If TRUE, removes the multiple panels (no facet_grid)
+#'@param arrows Logical (default FALSE). Should "direction" arrows be plotted inside dots?
+#'@param arrow.col Color of the \code{arrows}. Default is "beige".
 #'@return ggplot2 object for dotplot
 #'@examples
-#'## To be added later
+#'## Read sample data
+#'dt <- system.file("extdata", "sample_gsea_kegg.tsv", package = "aamisc")
+#'dat <- sample_read(dt)
+#'colnames(dat)
+#'
+#'## Dotplot with top 5 significant ontology (KEGG) terms
+#'p <- dotplotEnrich(
+#'         dt = dat,
+#'         topn = 5,
+#'         topn.pref = "dot",
+#'         qcut = 0.05,
+#'         nchar = 65,
+#'         direction = "Direction",
+#'         group = "Contrast",
+#'         dot = "NES",
+#'         dot.cex = 1,
+#'         qval = "qvalue",
+#'         term.id = "ID",
+#'         term.name = "Description",
+#'         term.reverse = TRUE,
+#'         plot.by = "direction")
+#'print(p)
+#'
+#'## Saving as PDF file: I recommend using cairo_pdf
+#'## DO NOT RUN
+#'cairo_pdf("pretty_enrich_plot.pdf", height = 7, width = 7)
+#'print(p)
+#'dev.off()
+#'
 #'@export
-
-
-# - TO DO: add support for different criteria to plot
-# - TO DO: remove parseGeneratio or add a flag for it
 
 dotplotEnrich <- function(
   dt,
@@ -39,16 +65,112 @@ dotplotEnrich <- function(
   term.name = "Description",
   term.reverse = FALSE,
   plot.by   = c("direction", "group")[1], # Panels (facet_grids) to divide while plotting
-  pdf.name  = NULL,
-  return.plotObj = FALSE
+  onepanel  = FALSE,
+  arrows    = FALSE,
+  arrow.col = "beige"
 ){
+  #-------------------------------------------------------------------------
+  # Check if the data structure is as required
+  #-------------------------------------------------------------------------
+  if(!(is.data.frame(dt) | is.data.table(dt))){
+    stop("'dt' can be either data.frame or data.table")
+  }
+
+  dt <- setDT(dt)
+  dtcols <- colnames(dt)
+
+  if(!is.numeric(topn)){
+    stop("'topn' must be an integer")
+  }
+
+  if(!topn.pref %in% c(c("qval", "dot"))){
+    stop("'topn.pref' can be either 'qval' or 'dot'")
+  }
+
+  if(!is.numeric(qcut) & (qcut >= 0 | qcut <=1)){
+    stop("'qcut' must be a numeric between 0 and 1")
+  }
+
+  if(!is.numeric(nchar) & (nchar > 4)){
+    stop("'qcut' must be a numeric bigger than 4")
+  }
+
+  if(!direction %in% dtcols){
+    stop(
+      paste0("Column with 'direction' information cannot be found in 'dt'\n",
+             "You have provided: ", direction, "\n",
+             "Column names in 'dt': ", paste(dtcols, collapse = ", ") )
+    )
+  }
+
+  if(!group %in% dtcols){
+    stop(
+      paste0("Column with 'group' information cannot be found in 'dt'\n",
+             "You have provided: ", group, "\n",
+             "Column names in 'dt': ", paste(dtcols, collapse = ", ") )
+    )
+  }
+
+  if(!dot %in% dtcols){
+    stop(
+      paste0("Column with 'dot' information cannot be found in 'dt'\n",
+             "You have provided: ", dot, "\n",
+             "Column names in 'dt': ", paste(dtcols, collapse = ", ") )
+    )
+  }
+
+  if(!is.numeric(dot.cex) & (dot.cex > 0)){
+    stop("'dot.cex' must be a numeric bigger 0")
+  }
+
+  if(!qval %in% dtcols){
+    stop(
+      paste0("Column with 'qval' information cannot be found in 'dt'\n",
+             "You have provided: ", qval, "\n",
+             "Column names in 'dt': ", paste(dtcols, collapse = ", ") )
+    )
+  }
+
+  if(!term.id %in% dtcols){
+    stop(
+      paste0("Column with 'term.id' information cannot be found in 'dt'\n",
+             "You have provided: ", term.id, "\n",
+             "Column names in 'dt': ", paste(dtcols, collapse = ", ") )
+    )
+  }
+
+  if(!term.name %in% dtcols){
+    stop(
+      paste0("Column with 'term.id' information cannot be found in 'dt'\n",
+             "You have provided: ", term.name, "\n",
+             "Column names in 'dt': ", paste(dtcols, collapse = ", ") )
+    )
+  }
+
+  if(!is.logical(term.reverse)){
+    stop("'term.reverse' must be logical")
+  }
+
+  if(!plot.by %in% c("direction", "group")){
+    stop("'plot.by' can be either 'direction' or 'group'")
+  }
+
+  if(!is.logical(arrows)){
+    stop("'arrows' must be logical")
+  }
+
   #-------------------------------------------------------------------------
   # Input data (create data.table)
   #-------------------------------------------------------------------------
-  dt <- setDT(dt)
   dt[,eval(group)] <- dt[,get(group)] %>% as.factor
   dt[,eval(direction)] <- dt[,get(direction)] %>% as.factor
   dt[,eval(dot) := parseGeneRatio(get(dot))]
+
+  dt[, .label := get(direction)]
+  dt[tolower(.label) == "down", .label := "\u25BC"]
+  dt[tolower(.label) == "up", .label := "\u25B2"]
+  dt[tolower(.label) == "all", .label := "\u21C5"]
+  dt[!tolower(get(direction)) %in% c("all", "down", "up"), .label := "\u00D7"]
 
   #-------------------------------------------------------------------------
   # Debug variable below
@@ -87,7 +209,6 @@ dotplotEnrich <- function(
 
   ids <- ids[get(qval) < qcut, get(term.id)]
   datP <- dt[(get(term.id) %in% ids) & (get(qval) < qcut),]
-  #print(datP)
   datP <- datP[, eval(dot) := parseGeneRatio(get(dot))]
 
   #-------------------------------------------------------------------------
@@ -102,10 +223,9 @@ dotplotEnrich <- function(
   colnames.hcMat.final <- paste(lapply(hcMat, colnames) %>% unlist,
                                 rep(panels.hcMat, times = lapply(hcMat, function(x){dim(x)[2]}) %>% unlist),
                                 sep = "_")
-  colnames(hcMat.final) <- colnames.hcMat.final #paste(colnames(hcMat.final), rep(panels.hcMat, each = length(panels.hcMat)), sep = "_")
+  colnames(hcMat.final) <- colnames.hcMat.final
 
   hcDist <- dist(hcMat.final, method = "canberra")
-  #if(!is.null(dim(hcDist))){
   if(attributes(hcDist)$Size > 1){
     hc <- hclust(hcDist, method = "ward.D2")
     hcOrder <- hc$order %>% rev
@@ -122,48 +242,49 @@ dotplotEnrich <- function(
   }
   datP[, eval(group) := factor(datP[,get(group)], levels = levels(dt[,get(group)]) %>% unique)]
   datP[, eval(direction) := factor(datP[,get(direction)], levels = levels(dt[,get(direction)]) %>% unique)]
-    #print(datP)
 
   #-------------------------------------------------------------------------
   # Generate plots
   #-------------------------------------------------------------------------
-  if( dim(datP)[1] == 0 ){
+  if( nrow(datP) == 0 ){
     message("No terms enriched. Skipping the dotplot...")
   }else{
-    if(plot.by == "direction"){
-      p <- ggplot(datP, aes(x = get(group), y = get(term.name))) +
-        geom_point(aes(size = get(dot), color = get(qval))) +
-        theme_bw(base_size = 12) +
-        scale_colour_gradient(limits=c(0, qcut), low="red", high="blue") +
-        ylab(NULL) + xlab(NULL) +
-        scale_x_discrete(drop=FALSE) +
-        scale_y_discrete(label=function(x) abbrev(x,nchar)) +
-        scale_size_area() +
-        labs(size=dot, colour=qval) +
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-        facet_grid(~get(direction), drop = FALSE)
-    }else if(plot.by == "group"){
-      p <- ggplot(datP, aes(x = get(direction), y = get(term.name))) +
-        geom_point(aes(size = get(dot), color = get(qval))) +
-        theme_bw(base_size = 12) +
-        scale_colour_gradient(limits=c(0, qcut), low="red", high="blue") +
-        ylab(NULL) + xlab(NULL) +
-        scale_x_discrete(drop=FALSE) +
-        scale_y_discrete(label=function(x) abbrev(x,nchar)) +
-        scale_size_area() +
-        labs(size=dot, colour=qval) +
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-        facet_grid(~get(group), drop = FALSE)
-    }
+    p <- ggplot(datP, aes(x = switch(plot.by,
+                                     "direction" = switch(as.character(onepanel),
+                                                          "FALSE" = get(group),
+                                                          "TRUE"  = get(direction)
+                                                          ),
+                                     "group"     = switch(as.character(onepanel),
+                                                          "FALSE" = get(direction),
+                                                          "TRUE"  = get(group)
+                                                          )
+                                     ),
+                          y = get(term.name))) +
+      geom_point(aes(size = get(dot), color = get(qval))) +
+      switch(as.character(arrows),
+             "TRUE" = geom_text(aes(label = .label, size = get(dot)),
+                                family = "Arial Unicode MS",
+                                color = arrow.col,
+                                show.legend = FALSE)
+
+             ) +
+      theme_bw(base_size = 12) +
+      scale_colour_gradient(limits=c(0, qcut), low="red", high="blue") +
+      ylab(NULL) + xlab(NULL) +
+      scale_x_discrete(drop=FALSE) +
+      scale_y_discrete(label=function(x) abbrev(x,nchar)) +
+      scale_size_area() +
+      labs(size=dot, colour=qval) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+      switch(as.character(onepanel),
+             "FALSE" = switch(plot.by,
+                              "direction" = facet_grid(~get(direction), drop = FALSE),
+                              "group"     = facet_grid(~get(group), drop = FALSE)
+                              )
+             )
+    return(p)
   }
 
-  if(!is.null(pdf.name)){
-    pdf(pdf.name, useDingbats = FALSE)
-    print(p)
-    dev.off()
-  }
-
-  return(p)
 }
 
 ## Helper functions
