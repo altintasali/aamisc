@@ -5,7 +5,6 @@
 #' @return Path of the current script
 #' @export
 #'
-#' @examples
 #' @references
 #' This script was inspired by \href{https://stackoverflow.com/a/49197577/1488825}{StackOverflow post} by user \href{https://stackoverflow.com/users/9131220/tinker}{Tinker}.
 #' Only added a parameter called "keep_name"

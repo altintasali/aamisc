@@ -12,15 +12,21 @@
 #'     \item \code{after} Moves the column after \code{ba}
 #'     }
 #'@param ba The column that points "before" or "after" locations used in \code{where}
+#'
 #'@return Re-ordered \code{data.table}
+#'
+#'@importFrom data.table data.table setcolorder
+#'
 #'@examples
-#'DT <- data.table(A=sample(3, 10, TRUE),
-#'                 B=sample(letters[1:3], 10, TRUE), C=sample(10))
+#'DT <- data.table::data.table(A=sample(3, 10, TRUE),
+#'                             B=sample(letters[1:3], 10, TRUE), C=sample(10))
 #'DT <- moveMeDataTable(DT, "C", "after", "A")
+#'
 #'@author
 #'User \href{https://stackoverflow.com/users/5973989/moun}{Moun} and \href{https://stackoverflow.com/users/1270695/a5c1d2h2i1m1n2o1r2t1}{A5C1D2H2I1M1N2O1R2T1} from StackOverflow.
 #'@references
 #'\href{https://stackoverflow.com/questions/18339370/reordering-columns-in-a-large-dataframe}{StackOverflow Thread}
+#'
 #'@export
 
 moveMeDataTable <-function(data, tomove, where = "last", ba = NULL) {

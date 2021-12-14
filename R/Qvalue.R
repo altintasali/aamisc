@@ -5,6 +5,7 @@
 #' will be used as \code{method} in \code{\link{p.adjust}}. Default is "BH".
 #' @return q-values. If q-value cannot be calculated by \code{\link{qvalue}}, it throws an error. The \code{\link{Qvalue}} catches
 #' this error without stopping and changes the p-value adjustment to \code{\link{p.adjust}}.
+#' @import qvalue
 #' @examples
 #'# Q-values can be calculated
 #'p <- c(runif(n = 100, min = 0, max = 0.05),
@@ -24,7 +25,7 @@
 Qvalue <- function(x, alternative.method = "BH"){
   tryCatch(
     expr = {
-      y <- qvalue(x)$qvalues
+      y <- qvalue::qvalue(x)$qvalues
       message("Successfully calculated Q-value")
       return(y)
     },

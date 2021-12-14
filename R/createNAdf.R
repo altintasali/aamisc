@@ -13,8 +13,10 @@
 #'x <- data.frame(x)
 #'print(x)
 #'
+#'\dontrun{
 #'## Throws an error as the data.frame is not empty.
 #'createNAdf(df = x, onlyEmptyTable = TRUE)
+#'}
 #'
 #'## Setting the onlyEmptyTable to FALSE will ignore it
 #'createNAdf(df = x, onlyEmptyTable = FALSE)

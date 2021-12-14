@@ -10,10 +10,8 @@
 #'@examples
 #'#A detailed example will come here
 #'@export
-
-#TODO: create proper examples for this function
-
-fittedHR <- function(hr.out.object = hrOut, inputTime, tau = 24, trend.degree = 0){
+fittedHR <- function(hr.out.object, inputTime, tau = 24, trend.degree = 0){
+  #TODO: create proper examples for this function
   Tau <- tau
   trend.degree <- trend.degree
   inputtime <- inputTime

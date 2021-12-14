@@ -10,14 +10,23 @@
 #'@param dot The column name in \code{dt} defining the dot sizes. It must be numeric (e.g. 0.07) or character of fractions (e.g. "7/100")
 #'@param dot.cex Positive numeric dot size scaling parameter.
 #'@param qval The column name in \code{dt} defining the adjusted p-values for the enrichment.
-#'@param ID The column name in \code{dt} defining the ID of the enriched term.
-#'@param Description The column name in \code{dt} defining the description of the enriched term.
 #'@param term.reverse Logical. Controls the reverse order (y-axis) plotting.
 #'@param plot.by Panels (facet_grids) to divide while plotting. The options are "direction" (default) and "group"
 #'@param onepanel Logical (default FALSE). If TRUE, removes the multiple panels (no facet_grid)
 #'@param arrows Logical (default FALSE). Should "direction" arrows be plotted inside dots?
+#'@param term.id ID of the ontology term
+#'@param term.name Name of the ontology term
 #'@param arrow.col Color of the \code{arrows}. Default is "beige".
+#'
 #'@return ggplot2 object for dotplot
+#'
+#'@import ggplot2
+#'@import magrittr
+#'@importFrom data.table data.table setDT is.data.table
+#'@importFrom stats hclust dist p.adjust
+#'@importFrom utils head
+#'
+#'
 #'@examples
 #'## Read sample data
 #'dt <- system.file("extdata", "sample_gsea_kegg.tsv", package = "aamisc")
@@ -43,13 +52,13 @@
 #'print(p)
 #'
 #'## Saving as PDF file: I recommend using cairo_pdf
-#'## DO NOT RUN
+#'\dontrun{
 #'cairo_pdf("pretty_enrich_plot.pdf", height = 7, width = 7)
 #'print(p)
 #'dev.off()
+#'}
 #'
 #'@export
-
 dotplotEnrich <- function(
   dt,
   topn      = 10,
@@ -69,6 +78,11 @@ dotplotEnrich <- function(
   arrows    = FALSE,
   arrow.col = "beige"
 ){
+  ##------------------------------------------------------------------------
+  ## Fix global variables
+  ##------------------------------------------------------------------------
+  .label <- . <- `:=` <- `.SD` <- NULL
+
   #-------------------------------------------------------------------------
   # Check if the data structure is as required
   #-------------------------------------------------------------------------
@@ -76,7 +90,7 @@ dotplotEnrich <- function(
     stop("'dt' can be either data.frame or data.table")
   }
 
-  dt <- setDT(dt)
+  dt <- data.table::setDT(dt)
   dtcols <- colnames(dt)
 
   if(!is.numeric(topn)){
@@ -227,7 +241,7 @@ dotplotEnrich <- function(
 
   hcDist <- dist(hcMat.final, method = "canberra")
   if(attributes(hcDist)$Size > 1){
-    hc <- hclust(hcDist, method = "ward.D2")
+    hc <- stats::hclust(hcDist, method = "ward.D2")
     hcOrder <- hc$order %>% rev
     idOrder <- hcMat.final[hcOrder, ] %>% rownames
     idOrder <- lapply(idOrder, function(x){grep(x, datP[,get(term.id)] %>% unlist)}) %>% do.call(c, .)
@@ -291,9 +305,4 @@ dotplotEnrich <- function(
 parseGeneRatio <- function(x){lapply(x, function(a){eval(parse(text = a))}) %>% unlist}
 
 parseMath <- function(x){eval(parse(text = x))} # Text to math operations
-
-abbrev <- function(x, n=50){ #x: vector of character, n: maximum character allowed
-  x[nchar(x) >= n] <- paste(strtrim(x[nchar(x) >= n], n-3), "...", sep="")
-  return(x)
-}
 

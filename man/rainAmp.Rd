@@ -56,7 +56,7 @@ Table with the circadians results
 }
 }
 \description{
-This function runs \link{rain} and calculates the amplitude and phases using \link{HarmonicRegression}. Input can be log2 transformed data (\code{logged = TRUE}) and if so, the relative amplitudes will be calculated.
+This function runs \link{rain} and calculates the amplitude and phases using \code{HarmonicRegression}. Input can be log2 transformed data (\code{logged = TRUE}) and if so, the relative amplitudes will be calculated.
 }
 \examples{
 ##------------------------------------------------------------------------
@@ -92,8 +92,8 @@ res_linear <- rainAmp(x = test_linear,
                       trend = FALSE)
 res_linear[1,]
 ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
-##     Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude hr.phase      hr.pVal      hr.qVal
-## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3967611 24.00000 0.000000e+00 0.000000e+00
+##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
+## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3967611 (...)
 
 ##-----------------------------------------------
 ## Log2 cale
@@ -113,7 +113,7 @@ res_log2 <- rainAmp(x = test_log2,
                     trend = FALSE)
 res_log2[1,]
 ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
-##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude hr.phase      hr.pVal      hr.qVal
-## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3934892       24 8.006058e-46 2.401817e-45
+##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
+## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3934892 (...)
 
 }

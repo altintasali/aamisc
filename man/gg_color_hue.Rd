@@ -7,7 +7,7 @@
 gg_color_hue(n)
 }
 \arguments{
-\item{x}{Number of colors}
+\item{n}{Number of colors}
 }
 \value{
 Vector with color hexcodes
@@ -20,8 +20,4 @@ gg_color_hue(2)
 # [1] "#F8766D" "#00BFC4"
 gg_color_hue(5)
 # [1] "#F8766D" "#A3A500" "#00BF7D" "#00B0F6" "#E76BF3"
-res <- uniqueNames(x, sep = "_")
-print(res)
-res2 <- uniqueNames(x, sep = ".")
-print(res2)
 }

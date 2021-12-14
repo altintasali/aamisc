@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @examples
-#'
+#' logAmp2relAmp(1:4)
 logAmp2relAmp <- function(x){
   if(!is.numeric(x)){
     stop("x must be a numeric vector")

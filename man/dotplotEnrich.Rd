@@ -45,6 +45,10 @@ dotplotEnrich(
 
 \item{qval}{The column name in \code{dt} defining the adjusted p-values for the enrichment.}
 
+\item{term.id}{ID of the ontology term}
+
+\item{term.name}{Name of the ontology term}
+
 \item{term.reverse}{Logical. Controls the reverse order (y-axis) plotting.}
 
 \item{plot.by}{Panels (facet_grids) to divide while plotting. The options are "direction" (default) and "group"}
@@ -54,10 +58,6 @@ dotplotEnrich(
 \item{arrows}{Logical (default FALSE). Should "direction" arrows be plotted inside dots?}
 
 \item{arrow.col}{Color of the \code{arrows}. Default is "beige".}
-
-\item{ID}{The column name in \code{dt} defining the ID of the enriched term.}
-
-\item{Description}{The column name in \code{dt} defining the description of the enriched term.}
 }
 \value{
 ggplot2 object for dotplot
@@ -90,9 +90,10 @@ p <- dotplotEnrich(
 print(p)
 
 ## Saving as PDF file: I recommend using cairo_pdf
-## DO NOT RUN
+\dontrun{
 cairo_pdf("pretty_enrich_plot.pdf", height = 7, width = 7)
 print(p)
 dev.off()
+}
 
 }

@@ -29,5 +29,5 @@ Below are some details about the different amplitude definitions in cosinor regr
 \deqn{ A_{rel} = (2^{2(A_{log})}-1)/(2^{2(A_{log})}-1) }
 }
 \examples{
-
+logAmp2relAmp(1:4)
 }

@@ -9,7 +9,7 @@ abbrev(x, n = 50)
 \arguments{
 \item{x}{A vector of character string.}
 
-\item{n}{Maximum Number of characters to be displayed before suffixed with triple dots ("...")}
+\item{n}{Maximum number (positive integer) of characters to be displayed before suffixed with triple dots ("...").}
 }
 \value{
 An abbreviated character string
@@ -18,9 +18,8 @@ An abbreviated character string
 Abbreviate character string using a maximum character limit
 }
 \examples{
-
 a <- paste(letters, collapse = "")
-abbrev(a, n = 0)
+abbrev(a, n = 1)
 #[1] "a..."
 
 abbrev(a, n = 4)

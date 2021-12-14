@@ -28,9 +28,10 @@ Re-ordered \code{data.table}
 This function helps moving the columns in big \code{\link{data.table}}.
 }
 \examples{
-DT <- data.table(A=sample(3, 10, TRUE),
-                B=sample(letters[1:3], 10, TRUE), C=sample(10))
+DT <- data.table::data.table(A=sample(3, 10, TRUE),
+                            B=sample(letters[1:3], 10, TRUE), C=sample(10))
 DT <- moveMeDataTable(DT, "C", "after", "A")
+
 }
 \references{
 \href{https://stackoverflow.com/questions/18339370/reordering-columns-in-a-large-dataframe}{StackOverflow Thread}

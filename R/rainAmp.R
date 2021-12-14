@@ -1,5 +1,6 @@
 #' \code{rain} wrapper with amplitude/phase estimations from \code{HarmonicRegression}
-#' @description This function runs [rain] and calculates the amplitude and phases using [HarmonicRegression]. Input can be log2 transformed data (\code{logged = TRUE}) and if so, the relative amplitudes will be calculated.
+#' @description This function runs [rain] and calculates the amplitude and phases using \code{HarmonicRegression}. Input can be log2 transformed data (\code{logged = TRUE}) and if so, the relative amplitudes will be calculated.
+#'
 #' @param x Numeric matrix. Rows = times, Columns = Gene names. See [rain] for details. Rows (times) should be sorted
 #' @param times Numeric vector for times. Length should be equal to the row length of \code{x}
 #' @param Period Period of [harmonic.regression]. Default = 24 (hours).
@@ -12,7 +13,6 @@
 #' @param ... Further parameters can be passed to [rain], [harmonic.regression]
 #'
 #' @return Table with the circadians results
-#'
 #' * Tags: Gene names (corresponds to the column names of input matrix \code{x})
 #' * pVal: p-value calculated by [rain]
 #' * phase: phase calculated by [rain]
@@ -26,6 +26,11 @@
 #' * hr.pVal: p-value calculated by [harmonic.regression]
 #' * hr.qVal: q-value calculated by [harmonic.regression]
 #'
+#'
+#' @import rain
+#' @import HarmonicRegression
+#' @importFrom parallel detectCores
+#' @importFrom data.table data.table setDT
 #' @export
 #'
 #' @examples
@@ -62,8 +67,8 @@
 #'                       trend = FALSE)
 #' res_linear[1,]
 #' ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
-#' ##     Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude hr.phase      hr.pVal      hr.qVal
-#' ## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3967611 24.00000 0.000000e+00 0.000000e+00
+#' ##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
+#' ## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3967611 (...)
 #'
 #' ##-----------------------------------------------
 #' ## Log2 cale
@@ -83,8 +88,8 @@
 #'                     trend = FALSE)
 #' res_log2[1,]
 #' ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
-#' ##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude hr.phase      hr.pVal      hr.qVal
-#' ## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3934892       24 8.006058e-46 2.401817e-45
+#' ##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
+#' ## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3934892 (...)
 #'
 rainAmp <- function(x,
                     times,
@@ -96,11 +101,18 @@ rainAmp <- function(x,
                     trend.pol.degree = 1,
                     threads = NULL, ...){
 
+  ##------------------------------------------------------------------------
+  ## Fix global variables
+  ##------------------------------------------------------------------------
+  detectCores <- pVal.adj <- pVal <- peak <- phase <- trough <- peak.shape <- `:=` <- NULL
 
+  ##------------------------------------------------------------------------
+  ## Function
+  ##------------------------------------------------------------------------
   # thread management
   # TODO: implement this later if necessary
   if(is.null(threads)){
-    mcores <- detectCores()
+    mcores <- parallel::detectCores()
   } else{
     mcores <- threads
   }
@@ -132,7 +144,7 @@ rainAmp <- function(x,
 
   # make data.table
   rainOut <- data.frame(Tags = rownames(rainOut), rainOut)
-  rainOut <- rainOut %>% setDT
+  rainOut <- data.table::setDT(rainOut)
 
   # adjust p-value
   rainOut <- rainOut[, pVal.adj := p.adjust(pVal, method = pAdjMethod)]
@@ -167,12 +179,12 @@ rainAmp <- function(x,
                               trend.eliminate = trend,
                               trend.degree = trend.pol.degree)
   if(logged){
-    rainOut$hr.amplitude <- hreg$pars$amp %>% logAmp2relAmp
+    rainOut$hr.amplitude <- logAmp2relAmp(hreg$pars$amp)
   }else{
     rainOut$hr.amplitude <- hreg$pars$amp
   }
 
-  rainOut$hr.phase <- hreg$pars$phi %>% rad2hrs
+  rainOut$hr.phase <- rad2hrs(hreg$pars$phi)
   rainOut$hr.pVal <- hreg$pvals
   rainOut$hr.qVal <- hreg$qvals
 

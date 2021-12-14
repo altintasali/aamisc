@@ -4,7 +4,7 @@
 \alias{fittedHR}
 \title{Extracts fitted values from \code{\link{harmonic.regression}} object}
 \usage{
-fittedHR(hr.out.object = hrOut, inputTime, tau = 24, trend.degree = 0)
+fittedHR(hr.out.object, inputTime, tau = 24, trend.degree = 0)
 }
 \arguments{
 \item{hr.out.object}{Output object from \code{\link{harmonic.regression}}}

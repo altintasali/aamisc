@@ -3,6 +3,8 @@
 #' @param rad radian
 #'
 #' @return hours
+#'
+#' @importFrom NISTunits NISTradianTOdeg
 #' @export
 #'
 #' @examples
@@ -10,6 +12,6 @@
 #' x <- degree*2*pi/360
 #' rad2hrs(x)
 rad2hrs <- function(rad){
-  hrs <- NISTradianTOdeg(rad) / 360 * 24
+  hrs <- NISTunits::NISTradianTOdeg(rad) / 360 * 24
   return(hrs)
 }
