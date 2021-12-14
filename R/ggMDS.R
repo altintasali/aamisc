@@ -123,14 +123,22 @@ ggMDS <- function(mds,
     stop("rownames(meta) should be identical to colnames(x)")
   }
   axisLab <- mds$axislabel
-  mds <- reshape2::melt(as.matrix(mds$cmdscale.out))
-  colnames(mds)[1:2] <- c("sample", "dimension")
-  mds$dimension <- paste0("dim", mds$dimension)
-  mds <- reshape2::dcast(data = mds, formula = sample ~ dimension, value.var = "value")
-  meta[,".sample"] <- rownames(meta)
-  mds <- merge(mds, meta, by.x = "sample", by.y= ".sample")
+  lambda <- pmax(mds$eigen.values, 0)
+  X <- dim[1]
+  mds$X <- mds$eigen.vectors[, X] * sqrt(lambda[X])
+  Y <- dim[2]
+  mds$Y <- mds$eigen.vectors[, Y] * sqrt(lambda[Y])
 
-  p <- ggplot(data = mds,
+  pdat <- data.frame(.sample = rownames(mds$distance.matrix.squared), dim1 = mds$X, dim2 = mds$Y)
+  colnames(pdat)[2:3] <- dim
+  pdat <- reshape2::melt(pdat, id = ".sample")
+  colnames(pdat)[1:2] <- c(".sample", "dimension")
+  pdat$dimension <- paste0("dim", pdat$dimension)
+  pdat <- reshape2::dcast(data = pdat, formula = .sample ~ dimension, value.var = "value")
+  meta[,".sample"] <- rownames(meta)
+  pdat <- merge(pdat, meta, by = ".sample")
+
+  p <- ggplot(data = pdat,
               mapping = aes_string(x = paste0("dim",dim[1]),
                                    y = paste0("dim",dim[2]))) +
     switch(EXPR = as.character(is.null(shape.by)),
