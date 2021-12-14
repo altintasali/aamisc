@@ -123,7 +123,7 @@ ggMDS <- function(mds,
     stop("rownames(meta) should be identical to colnames(x)")
   }
   axisLab <- mds$axislabel
-  mds <- reshape2::melt(data = mds$cmdscale.out, value.name = "value")
+  mds <- reshape2::melt(data = as.matrix(mds$cmdscale.out))
   colnames(mds)[1:2] <- c("sample", "dimension")
   mds$dimension <- paste0("dim", mds$dimension)
   mds <- reshape2::dcast(data = mds, formula = sample ~ dimension, value.var = "value")
