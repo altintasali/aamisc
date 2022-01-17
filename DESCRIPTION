@@ -24,4 +24,7 @@ Imports:
     ggplot2,
     qvalue,
     NISTunits,
-    rstudioapi
+    rstudioapi,
+    dplyr,
+    ggrepel,
+    scales
