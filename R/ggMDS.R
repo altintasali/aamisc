@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @importFrom limma plotMDS
-#' @importFrom reshape2 melt dcast
+#' @importFrom data.table melt dcast
 #' @import ggplot2
 #'
 #' @examples
@@ -131,10 +131,10 @@ ggMDS <- function(mds,
 
   pdat <- data.frame(.sample = rownames(mds$distance.matrix.squared), dim1 = mds$X, dim2 = mds$Y)
   colnames(pdat)[2:3] <- dim
-  pdat <- reshape2::melt(pdat, id = ".sample")
+  pdat <- data.table::melt(pdat, id = ".sample")
   colnames(pdat)[1:2] <- c(".sample", "dimension")
   pdat$dimension <- paste0("dim", pdat$dimension)
-  pdat <- reshape2::dcast(data = pdat, formula = .sample ~ dimension, value.var = "value")
+  pdat <- data.table::dcast(data = pdat, formula = .sample ~ dimension, value.var = "value")
   meta[,".sample"] <- rownames(meta)
   pdat <- merge(pdat, meta, by = ".sample")
 
