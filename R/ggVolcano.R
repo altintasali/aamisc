@@ -24,10 +24,10 @@
 #'
 #' @export
 #'
-#' @importFrom reshape2 melt
 #' @importFrom dplyr mutate
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom scales breaks_pretty
+#' @importFrom data.table data.table dcast `:=`
 #' @import ggplot2
 #'
 #' @examples
@@ -83,7 +83,7 @@ ggVolcano <- function(x,
   ##------------------------------------------------------------------------
   ## Assign parameters to NULL to avoid check() NOTES
   ##------------------------------------------------------------------------
-  y <- color <- value <- text <- `:=` <- NULL
+  y <- color <- value <- text <- `:=` <- .dummy <-  NULL
 
   ##------------------------------------------------------------------------
   ## Modify input
@@ -128,11 +128,28 @@ ggVolcano <- function(x,
   ## DGE info
   ##------------------------------------------------------------------------
   if(dge.info){
-    updown <- x[get(fdr.column) <= fdr & abs(get(logFC.column)) >= .logFC,]
-    updown <- dplyr::mutate(updown, updown=ifelse(logFC<=0, "down", "up"))
-    updown <- reshape2::melt(table(updown$updown))
+    updown <- x[, updown := ifelse(get(logFC.column) <= 0, "down", "up")]
     updown <- data.table::as.data.table(updown)
-    colnames(updown)[1] <- "direction"
+    #updown <- x[get(fdr.column) <= fdr & abs(get(logFC.column)) >= .logFC,]
+    updown$updown <- factor(updown$updown, levels = c("down", "up"))
+    updown[, .dummy := "count"]
+
+    if(nrow(updown[get(fdr.column) <= fdr, ]) == 0){
+      updown <- data.table::dcast(updown,
+                                updown ~ .dummy,
+                                value.var = "updown",
+                                fun.aggregate = length,
+                                drop = FALSE)
+      updown[,2] <- 0
+    }else{
+      updown <- data.table::dcast(updown[get(fdr.column) <= fdr, ],
+                                updown ~ .dummy,
+                                value.var = "updown",
+                                fun.aggregate = length,
+                                drop = FALSE)
+
+    }
+    colnames(updown)[1:2] <- c("direction", "value")
     updown[, x:= c(-max(abs(range(x[,get(logFC.column)]))*0.9), max(abs(range(x[,get(logFC.column)]))*0.9))]
     updown$y <- c(max(-log10(x[,fdr.column, with = FALSE])*dge.info.loc))
     #updown[, text:= paste0(c("↓ ", "↑ "), value)]
@@ -145,57 +162,57 @@ ggVolcano <- function(x,
   ##------------------------------------------------------------------------
   p <- suppressMessages(
     ggplot(x, aes(x = get(logFC.column),
-                     y = switch(yaxis,
-                                "fdr" = -log10(get(fdr.column)),
-                                "pvalue" = -log10(get(pvalue.column)),
-                                ),
-                     )
-              ) +
-    geom_point(col=x$.col, alpha = alpha, size = dot.size) +
-    geom_vline(xintercept = c(-abs(logFC),abs(logFC)), linetype = linetype) +
-    geom_hline(yintercept = switch(yaxis,
-                                   "fdr" = -log10(.fdr),
-                                   "pvalue" = -log10(.pvalue),
-                                   ),
-               linetype = linetype
-               ) +
-    switch(EXPR = as.character(dge.info),
-           "TRUE" = geom_label(data = updown,
-                              aes(x,y, label = text),
-                              color = updown$color,
-                              parse = F,
-                              size = text.size,
-                              fill = NA
-                              )
-           ) +
-    switch(EXPR = as.character(is.null(xlab)),
-           "TRUE" = xlab(expression(log[2]~Fold~Change)),
-           "FALSE" = xlab(xlab)
+                  y = switch(yaxis,
+                             "fdr" = -log10(get(fdr.column)),
+                             "pvalue" = -log10(get(pvalue.column)),
+                  ),
+    )
     ) +
-    switch(EXPR = as.character(is.null(ylab)),
-           "TRUE" = switch(yaxis,
-                           "fdr" = ylab(expression(-log[10](FDR))),
-                           "pvalue" = ylab(expression(-log[10](p)))
-           ),
-           "FALSE" = xlab(xlab)
-    ) +
-    switch(EXPR = as.character(!is.null(text2plot)),
-           "TRUE" = ggrepel::geom_text_repel(
-             data = x[grepExact(text2plot, get(text.column))],
-             aes(x = get(logFC.column),
-                 y = -log10(get(fdr.column)),
-                 label = get(text.column)
-                 ),
-             color = x[grepExact(text2plot, get(text.column)), .col],
-             size = text.size,
-             box.padding = 0.5,
-             max.overlaps = Inf
+      geom_point(col=x$.col, alpha = alpha, size = dot.size) +
+      geom_vline(xintercept = c(-abs(logFC),abs(logFC)), linetype = linetype) +
+      geom_hline(yintercept = switch(yaxis,
+                                     "fdr" = -log10(.fdr),
+                                     "pvalue" = -log10(.pvalue),
+      ),
+      linetype = linetype
+      ) +
+      switch(EXPR = as.character(dge.info),
+             "TRUE" = geom_label(data = updown,
+                                 aes(x,y, label = text),
+                                 color = updown$color,
+                                 parse = F,
+                                 size = text.size,
+                                 fill = NA
              )
-    ) +
-    theme_bw(base_size = 16) +
-    xlim(-max(abs(range(x[,get(logFC.column)]))), max(abs(range(x[,get(logFC.column)])))) +
-    scale_x_continuous(breaks = scales::breaks_pretty(n = 10)) +
-    coord_cartesian(xlim = c(-max(abs(range(x[,get(logFC.column)]))), max(abs(range(x[,get(logFC.column)])))))
+      ) +
+      switch(EXPR = as.character(is.null(xlab)),
+             "TRUE" = xlab(expression(log[2]~Fold~Change)),
+             "FALSE" = xlab(xlab)
+      ) +
+      switch(EXPR = as.character(is.null(ylab)),
+             "TRUE" = switch(yaxis,
+                             "fdr" = ylab(expression(-log[10](FDR))),
+                             "pvalue" = ylab(expression(-log[10](p)))
+             ),
+             "FALSE" = xlab(xlab)
+      ) +
+      switch(EXPR = as.character(!is.null(text2plot)),
+             "TRUE" = ggrepel::geom_text_repel(
+               data = x[grepExact(text2plot, get(text.column))],
+               aes(x = get(logFC.column),
+                   y = -log10(get(fdr.column)),
+                   label = get(text.column)
+               ),
+               color = x[grepExact(text2plot, get(text.column)), .col],
+               size = text.size,
+               box.padding = 0.5,
+               max.overlaps = Inf
+             )
+      ) +
+      theme_bw(base_size = 16) +
+      xlim(-max(abs(range(x[,get(logFC.column)]))), max(abs(range(x[,get(logFC.column)])))) +
+      scale_x_continuous(breaks = scales::breaks_pretty(n = 10)) +
+      coord_cartesian(xlim = c(-max(abs(range(x[,get(logFC.column)]))), max(abs(range(x[,get(logFC.column)])))))
   )
 
   return(p)
