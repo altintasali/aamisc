@@ -134,7 +134,7 @@ ggVolcano <- function(x,
     updown$updown <- factor(updown$updown, levels = c("down", "up"))
     updown[, .dummy := "count"]
 
-    if(nrow(updown[get(fdr.column) <= fdr, ]) == 0){
+    if(nrow(updown[get(fdr.column) <= fdr & abs(get(logFC.column)) >= .logFC, ]) == 0){
       updown <- data.table::dcast(updown,
                                 updown ~ .dummy,
                                 value.var = "updown",
@@ -142,7 +142,7 @@ ggVolcano <- function(x,
                                 drop = FALSE)
       updown[,2] <- 0
     }else{
-      updown <- data.table::dcast(updown[get(fdr.column) <= fdr, ],
+      updown <- data.table::dcast(updown[get(fdr.column) <= fdr & abs(get(logFC.column)) >= .logFC, ],
                                 updown ~ .dummy,
                                 value.var = "updown",
                                 fun.aggregate = length,
