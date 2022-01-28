@@ -286,7 +286,7 @@ dotplotEnrich <- function(
       scale_colour_gradient(limits=c(0, qcut), low="red", high="blue") +
       ylab(NULL) + xlab(NULL) +
       scale_x_discrete(drop=FALSE) +
-      scale_y_discrete(label=function(x) abbrev(x,nchar)) +
+      scale_y_discrete(label=function(x) stringr::str_trunc(string = x, width = nchar)) +
       scale_size_area() +
       labs(size=dot, colour=qval) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
