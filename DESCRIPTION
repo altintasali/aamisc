@@ -26,4 +26,5 @@ Imports:
     rstudioapi,
     dplyr,
     ggrepel,
-    scales
+    scales,
+    stringr

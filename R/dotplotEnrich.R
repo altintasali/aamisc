@@ -25,6 +25,7 @@
 #'@importFrom data.table data.table setDT is.data.table
 #'@importFrom stats hclust dist p.adjust
 #'@importFrom utils head
+#'@importFrom stringr str_trunc
 #'
 #'
 #'@examples
