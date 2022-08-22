@@ -59,6 +59,7 @@ Table with the circadians results
 This function runs \link{rain} and calculates the amplitude and phases using \code{HarmonicRegression}. Input can be log2 transformed data (\code{logged = TRUE}) and if so, the relative amplitudes will be calculated.
 }
 \examples{
+\dontrun{
 ##------------------------------------------------------------------------
 ## create a circadian dataset with different noise levels
 ##------------------------------------------------------------------------
@@ -115,5 +116,5 @@ res_log2[1,]
 ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
 ##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
 ## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3934892 (...)
-
+}
 }

@@ -34,6 +34,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' ##------------------------------------------------------------------------
 #' ## create a circadian dataset with different noise levels
 #' ##------------------------------------------------------------------------
@@ -90,7 +91,7 @@
 #' ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
 #' ##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
 #' ## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3934892 (...)
-#'
+#'}
 rainAmp <- function(x,
                     times,
                     Period = 24,
