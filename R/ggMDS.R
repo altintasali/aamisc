@@ -123,13 +123,20 @@ ggMDS <- function(mds,
     stop("rownames(meta) should be identical to colnames(x)")
   }
   axisLab <- mds$axislabel
-  lambda <- pmax(mds$eigen.values, 0)
   X <- dim[1]
-  mds$X <- mds$eigen.vectors[, X] * sqrt(lambda[X])
   Y <- dim[2]
-  mds$Y <- mds$eigen.vectors[, Y] * sqrt(lambda[Y])
 
-  pdat <- data.frame(.sample = rownames(mds$distance.matrix.squared), dim1 = mds$X, dim2 = mds$Y)
+  if(any("eigen.values" %in% names(mds))){
+    lambda <- pmax(mds$eigen.values, 0)
+    mds$X <- mds$eigen.vectors[, X] * sqrt(lambda[X])
+    mds$Y <- mds$eigen.vectors[, Y] * sqrt(lambda[Y])
+    pdat <- data.frame(.sample = rownames(mds$distance.matrix.squared), dim1 = mds$X, dim2 = mds$Y)
+  }else if(any("cmdscale.out" %in% names(mds))){
+    mds$X <- mds$cmdscale.out[,X]
+    mds$Y <- mds$cmdscale.out[,Y]
+    pdat <- data.frame(.sample = rownames(mds$cmdscale.out), dim1 = mds$X, dim2 = mds$Y)
+  }
+
   colnames(pdat)[2:3] <- dim
   pdat <- data.table::melt(pdat, id = ".sample")
   colnames(pdat)[1:2] <- c(".sample", "dimension")
