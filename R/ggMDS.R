@@ -135,6 +135,8 @@ ggMDS <- function(mds,
     mds$X <- mds$cmdscale.out[,X]
     mds$Y <- mds$cmdscale.out[,Y]
     pdat <- data.frame(.sample = rownames(mds$cmdscale.out), dim1 = mds$X, dim2 = mds$Y)
+  }else{
+    stop("MDS dimension not found. Check your input!!!")
   }
 
   colnames(pdat)[2:3] <- dim
