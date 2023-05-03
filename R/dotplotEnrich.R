@@ -87,7 +87,36 @@ dotplotEnrich <- function(
   ##------------------------------------------------------------------------
   ## Rename variables to avoud data.table conflicts
   ##------------------------------------------------------------------------
+  .direction <- direction
   .group <- group
+  .dot <- dot
+  .qval <- qval
+  .term.id <- term.id
+  .term.name <- term.name
+
+  if(.direction == ".direction"){
+    stop("Column name '.direction' not allowed. Please change the column name.")
+  }
+
+  if(.group == ".group"){
+    stop("Column name '.group' not allowed. Please change the column name.")
+  }
+
+  if(.dot == ".dot"){
+    stop("Column name '.dot' not allowed. Please change the column name.")
+  }
+
+  if(.qval == ".qval"){
+    stop("Column name '.qval' not allowed. Please change the column name.")
+  }
+
+  if(.term.id == ".term.id"){
+    stop("Column name '.term.id' not allowed. Please change the column name.")
+  }
+
+  if(.term.name == ".term.name"){
+    stop("Column name '.term.name' not allowed. Please change the column name.")
+  }
 
   #-------------------------------------------------------------------------
   # Check if the data structure is as required
@@ -183,14 +212,14 @@ dotplotEnrich <- function(
   # Input data (create data.table)
   #-------------------------------------------------------------------------
   dt[,eval(.group)] <- dt[,get(.group)] %>% as.factor
-  dt[,eval(direction)] <- dt[,get(direction)] %>% as.factor
-  dt[,eval(dot) := parseGeneRatio(get(dot))]
+  dt[,eval(.direction)] <- dt[,get(.direction)] %>% as.factor
+  dt[,eval(.dot) := parseGeneRatio(get(.dot))]
 
-  dt[, .label := get(direction)]
+  dt[, .label := get(.direction)]
   dt[tolower(.label) == "down", .label := "\u25BC"]
   dt[tolower(.label) == "up", .label := "\u25B2"]
   dt[tolower(.label) == "all", .label := "\u21C5"]
-  dt[!tolower(get(direction)) %in% c("all", "down", "up"), .label := "\u00D7"]
+  dt[!tolower(get(.direction)) %in% c("all", "down", "up"), .label := "\u00D7"]
 
   #-------------------------------------------------------------------------
   # Debug variable below
@@ -209,32 +238,32 @@ dotplotEnrich <- function(
   # Subset the top n terms to be plotted
   #-------------------------------------------------------------------------
   if(topn.pref == "qval"){
-    ids <- dt[order(get(direction),
-                    get(qval),
-                    -abs(get(dot))),
+    ids <- dt[order(get(.direction),
+                    get(.qval),
+                    -abs(get(.dot))),
               head(.SD, topn),
               by = .(get(.group),
-                     get(direction))]
+                     get(.direction))]
   }else if(topn.pref == "dot"){
-    ids <- dt[order(get(direction),
-                    -abs(get(dot)),
-                    get(qval),
+    ids <- dt[order(get(.direction),
+                    -abs(get(.dot)),
+                    get(.qval),
     ),
     head(.SD, topn),
     by = .(get(.group),
-           get(direction))]
+           get(.direction))]
   }else {
     stop("The order preference (priority) for topn gene can be either 'q' values or absolute 'dot' sizes")
   }
 
-  ids <- ids[get(qval) < qcut, get(term.id)]
-  datP <- dt[(get(term.id) %in% ids) & (get(qval) < qcut),]
-  datP <- datP[, eval(dot) := parseGeneRatio(get(dot))]
+  ids <- ids[get(.qval) < qcut, get(.term.id)]
+  datP <- dt[(get(.term.id) %in% ids) & (get(.qval) < qcut),]
+  datP <- datP[, eval(.dot) := parseGeneRatio(get(.dot))]
 
   #-------------------------------------------------------------------------
   # Hierarchical cluster for dot organization
   #-------------------------------------------------------------------------
-  cMat <- datP[,.(get(term.id), get(.group), get(direction))]
+  cMat <- datP[,.(get(.term.id), get(.group), get(.direction))]
   hcMat <- table(cMat)
   panels.hcMat <- attributes(hcMat)$dimnames$V3
   hcMat <- lapply(panels.hcMat, function(x){rbind(hcMat[,,x])})
@@ -250,18 +279,18 @@ dotplotEnrich <- function(
     hc <- stats::hclust(hcDist, method = "ward.D2")
     hcOrder <- hc$order %>% rev
     idOrder <- hcMat.final[hcOrder, ] %>% rownames
-    idOrder <- lapply(idOrder, function(x){grep(x, datP[,get(term.id)] %>% unlist)}) %>% do.call(c, .)
+    idOrder <- lapply(idOrder, function(x){grep(x, datP[,get(.term.id)] %>% unlist)}) %>% do.call(c, .)
     datP <- datP[idOrder, ]
   }else{
-    datP <- datP[order(get(direction), get(dot)),]
+    datP <- datP[order(get(.direction), get(.dot)),]
   }
 
-  datP[, eval(term.name) := factor(datP[,get(term.name)], levels = datP[,get(term.name)] %>% unique)]
+  datP[, eval(.term.name) := factor(datP[,get(.term.name)], levels = datP[,get(.term.name)] %>% unique)]
   if(term.reverse){
-    datP[, eval(term.name) := factor(datP[,get(term.name)], levels = datP[,get(term.name)] %>% unique %>% rev)]
+    datP[, eval(.term.name) := factor(datP[,get(.term.name)], levels = datP[,get(.term.name)] %>% unique %>% rev)]
   }
   datP[, eval(.group) := factor(datP[,get(.group)], levels = levels(dt[,get(.group)]) %>% unique)]
-  datP[, eval(direction) := factor(datP[,get(direction)], levels = levels(dt[,get(direction)]) %>% unique)]
+  datP[, eval(.direction) := factor(datP[,get(.direction)], levels = levels(dt[,get(.direction)]) %>% unique)]
 
   #-------------------------------------------------------------------------
   # Generate plots
@@ -272,17 +301,17 @@ dotplotEnrich <- function(
     p <- ggplot(datP, aes(x = switch(plot.by,
                                      "direction" = switch(as.character(onepanel),
                                                           "FALSE" = get(.group),
-                                                          "TRUE"  = get(direction)
+                                                          "TRUE"  = get(.direction)
                                                           ),
                                      "group"     = switch(as.character(onepanel),
-                                                          "FALSE" = get(direction),
+                                                          "FALSE" = get(.direction),
                                                           "TRUE"  = get(.group)
                                                           )
                                      ),
-                          y = get(term.name))) +
-      geom_point(aes(size = get(dot), color = get(qval))) +
+                          y = get(.term.name))) +
+      geom_point(aes(size = get(.dot), color = get(.qval))) +
       switch(as.character(arrows),
-             "TRUE" = geom_text(aes(label = .label, size = get(dot)),
+             "TRUE" = geom_text(aes(label = .label, size = get(.dot)),
                                 family = "Arial Unicode MS",
                                 color = arrow.col,
                                 show.legend = FALSE)
@@ -298,7 +327,7 @@ dotplotEnrich <- function(
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
       switch(as.character(onepanel),
              "FALSE" = switch(plot.by,
-                              "direction" = facet_grid(~get(direction), drop = FALSE),
+                              "direction" = facet_grid(~get(.direction), drop = FALSE),
                               "group"     = facet_grid(~get(.group), drop = FALSE)
                               )
              )
