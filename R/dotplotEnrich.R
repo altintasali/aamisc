@@ -84,6 +84,11 @@ dotplotEnrich <- function(
   ##------------------------------------------------------------------------
   .label <- . <- `:=` <- `.SD` <- NULL
 
+  ##------------------------------------------------------------------------
+  ## Rename variables to avoud data.table conflicts
+  ##------------------------------------------------------------------------
+  .group <- group
+
   #-------------------------------------------------------------------------
   # Check if the data structure is as required
   #-------------------------------------------------------------------------
@@ -177,7 +182,7 @@ dotplotEnrich <- function(
   #-------------------------------------------------------------------------
   # Input data (create data.table)
   #-------------------------------------------------------------------------
-  dt[,eval(group)] <- dt[,get(group)] %>% as.factor
+  dt[,eval(.group)] <- dt[,get(.group)] %>% as.factor
   dt[,eval(direction)] <- dt[,get(direction)] %>% as.factor
   dt[,eval(dot) := parseGeneRatio(get(dot))]
 
@@ -208,7 +213,7 @@ dotplotEnrich <- function(
                     get(qval),
                     -abs(get(dot))),
               head(.SD, topn),
-              by = .(get(group),
+              by = .(get(.group),
                      get(direction))]
   }else if(topn.pref == "dot"){
     ids <- dt[order(get(direction),
@@ -216,7 +221,7 @@ dotplotEnrich <- function(
                     get(qval),
     ),
     head(.SD, topn),
-    by = .(get(group),
+    by = .(get(.group),
            get(direction))]
   }else {
     stop("The order preference (priority) for topn gene can be either 'q' values or absolute 'dot' sizes")
@@ -229,7 +234,7 @@ dotplotEnrich <- function(
   #-------------------------------------------------------------------------
   # Hierarchical cluster for dot organization
   #-------------------------------------------------------------------------
-  cMat <- datP[,.(get(term.id), get(group), get(direction))]
+  cMat <- datP[,.(get(term.id), get(.group), get(direction))]
   hcMat <- table(cMat)
   panels.hcMat <- attributes(hcMat)$dimnames$V3
   hcMat <- lapply(panels.hcMat, function(x){rbind(hcMat[,,x])})
@@ -255,7 +260,7 @@ dotplotEnrich <- function(
   if(term.reverse){
     datP[, eval(term.name) := factor(datP[,get(term.name)], levels = datP[,get(term.name)] %>% unique %>% rev)]
   }
-  datP[, eval(group) := factor(datP[,get(group)], levels = levels(dt[,get(group)]) %>% unique)]
+  datP[, eval(.group) := factor(datP[,get(.group)], levels = levels(dt[,get(.group)]) %>% unique)]
   datP[, eval(direction) := factor(datP[,get(direction)], levels = levels(dt[,get(direction)]) %>% unique)]
 
   #-------------------------------------------------------------------------
@@ -266,12 +271,12 @@ dotplotEnrich <- function(
   }else{
     p <- ggplot(datP, aes(x = switch(plot.by,
                                      "direction" = switch(as.character(onepanel),
-                                                          "FALSE" = get(group),
+                                                          "FALSE" = get(.group),
                                                           "TRUE"  = get(direction)
                                                           ),
                                      "group"     = switch(as.character(onepanel),
                                                           "FALSE" = get(direction),
-                                                          "TRUE"  = get(group)
+                                                          "TRUE"  = get(.group)
                                                           )
                                      ),
                           y = get(term.name))) +
@@ -294,7 +299,7 @@ dotplotEnrich <- function(
       switch(as.character(onepanel),
              "FALSE" = switch(plot.by,
                               "direction" = facet_grid(~get(direction), drop = FALSE),
-                              "group"     = facet_grid(~get(group), drop = FALSE)
+                              "group"     = facet_grid(~get(.group), drop = FALSE)
                               )
              )
     return(p)
