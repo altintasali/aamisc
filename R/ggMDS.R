@@ -15,7 +15,6 @@
 #' @export
 #'
 #' @importFrom limma plotMDS
-#' @importFrom data.table melt dcast
 #' @import ggplot2
 #'
 #' @examples
