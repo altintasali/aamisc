@@ -130,32 +130,39 @@ ggMDS <- function(mds,
     lambda <- pmax(mds$eigen.values, 0)
     mds$X <- mds$eigen.vectors[, X] * sqrt(lambda[X])
     mds$Y <- mds$eigen.vectors[, Y] * sqrt(lambda[Y])
-    pdat <- data.frame(.sample = rownames(mds$distance.matrix.squared), dim1 = mds$X, dim2 = mds$Y)
+    pdat <- data.frame(.sample = rownames(mds$distance.matrix.squared),
+                       X = mds$X,
+                       Y = mds$Y)
+    vardat <- list(X = paste0("(", round(mds$var.explained[X]*100),"%)"),
+                   Y = paste0("(", round(mds$var.explained[Y]*100),"%)"))
   }else if(any("cmdscale.out" %in% names(mds))){
     mds$X <- mds$cmdscale.out[,X]
     mds$Y <- mds$cmdscale.out[,Y]
-    pdat <- data.frame(.sample = rownames(mds$cmdscale.out), dim1 = mds$X, dim2 = mds$Y)
+    pdat <- data.frame(.sample = rownames(mds$cmdscale.out),
+                       X = mds$X,
+                       Y = mds$Y)
   }else{
     stop("MDS dimension not found. Check your input!!!")
   }
 
-  colnames(pdat)[2:3] <- dim
-  pdat <- data.table::melt(pdat, id = ".sample")
-  colnames(pdat)[1:2] <- c(".sample", "dimension")
-  pdat$dimension <- paste0("dim", pdat$dimension)
-  pdat <- data.table::dcast(data = pdat, formula = .sample ~ dimension, value.var = "value")
+  # colnames(pdat)[2:3] <- dim
+  # pdat <- data.table::melt(pdat, id = ".sample")
+  # colnames(pdat)[1:2] <- c(".sample", "dimension")
+  # pdat$dimension <- paste0("dim", pdat$dimension)
+  # pdat <- data.table::dcast(data = pdat, formula = .sample ~ dimension, value.var = "value")
   meta[,".sample"] <- rownames(meta)
   pdat <- merge(pdat, meta, by = ".sample")
 
   p <- ggplot(data = pdat,
-              mapping = aes_string(x = paste0("dim",dim[1]),
-                                   y = paste0("dim",dim[2]))) +
+              mapping = aes(x = X,
+                            y = Y)) +
     switch(EXPR = as.character(is.null(shape.by)),
            "FALSE" = geom_point(aes_string(color = color.by, shape = shape.by), size = dot.size),
            "TRUE" = geom_point(aes_string(color = color.by), size = dot.size)) +
     switch(EXPR = as.character(is.null(text.by)),
            "FALSE" = geom_text(aes_string(label = text.by), size = text.size, vjust = 1.5)) +
-    xlab(paste(axisLab, dim[1])) + ylab(paste(axisLab, dim[2])) +
+    xlab(paste(axisLab, X, vardat$X)) +
+    ylab(paste(axisLab, Y, vardat$Y)) +
     theme_bw(base_size = 12) +
     theme(legend.position = legend.position)
 
