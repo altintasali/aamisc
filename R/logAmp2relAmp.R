@@ -12,11 +12,11 @@
 #'* Fold change amplitude \code{A_fc} is fold change of relative amplitude
 #'
 #'\deqn{ 2A_{log} = log_{2}(A_{fc}) }
-#'\deqn{ 2A_{fc} = (1+A_{rel}) / (1-A_{rel}) = 2^{2(A_{log})} }, therefore
-#'\deqn{ A_{rel} = (2^{2(A_{log})}-1)/(2^{2(A_{log})}-1) }
+#'\deqn{ A_{fc} = (1+A_{rel}) / (1-A_{rel}) = 2^{2(A_{log})} }, therefore
+#'\deqn{ A_{rel} = (2^{2(A_{log})}-1)/(2^{2(A_{log})}+1) }
 #'
 #' @export
-#'
+#' @seealso [rainAmp()]
 #' @examples
 #' logAmp2relAmp(1:4)
 logAmp2relAmp <- function(x){
