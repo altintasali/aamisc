@@ -153,7 +153,10 @@ ggVolcano <- function(x,
     updown[, x:= c(-max(abs(range(x[,get(logFC.column)]))*0.9), max(abs(range(x[,get(logFC.column)]))*0.9))]
     updown$y <- c(max(-log10(x[,fdr.column, with = FALSE])*dge.info.loc))
     #updown[, text:= paste0(c("↓ ", "↑ "), value)]
-    updown[, text:= paste0(c(intToUtf8(9660), intToUtf8(9650)), " ", value)]
+    #updown[, text:= paste0(c(intToUtf8(9660), intToUtf8(9650)), " ", value)]
+    #updown[, text := paste0(c("\u25BC", "\u25B2"), " ", value)]
+    #updown[, text := paste0(c("down:", "up:"), " ", value)]
+    updown[, text := value]
     updown[, color:= col.sig]
   }
 
