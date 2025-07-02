@@ -59,14 +59,13 @@ Table with the circadians results
 This function runs \link{rain} and calculates the amplitude and phases using \code{HarmonicRegression}. Input can be log2 transformed data (\code{logged = TRUE}) and if so, the relative amplitudes will be calculated.
 }
 \examples{
-\dontrun{
 ##------------------------------------------------------------------------
 ## create a circadian dataset with different noise levels
 ##------------------------------------------------------------------------
 noise_levels <- c(0, 0.02, 0.05) # range is [0,1]
 timeStart <- 0
 timeEnd <- 48
-time <- timeStart:timeEnd
+time <- seq(timeStart, timeEnd, by = 2)
 mesor <- 1 # baseline
 relative_amplitude <- 0.4
 amplitude <- mesor * relative_amplitude
@@ -93,14 +92,12 @@ res_linear <- rainAmp(x = test_linear,
                       pAdjMethod = "BH",
                       logged = FALSE, # Note that this is linear scale
                       trend = FALSE)
-res_linear[1,]
 
 ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
-##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
-## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3967611 (...)
+res_linear[1,1:10]
 
 ##-----------------------------------------------
-## Log2 cale
+## Log2 scale
 ##-----------------------------------------------
 test_log2 <- log2(test_linear)
 
@@ -115,11 +112,9 @@ res_log2 <- rainAmp(x = test_log2,
                     pAdjMethod = "BH",
                     logged = TRUE, # Note that this is log2 scale
                     trend = FALSE)
-res_log2[1,]
+
 ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
-##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
-## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3934892 (...)
-}
+res_log2[1,1:10]
 }
 \seealso{
 \code{\link[=logAmp2relAmp]{logAmp2relAmp()}}
