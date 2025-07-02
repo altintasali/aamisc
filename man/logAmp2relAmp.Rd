@@ -25,9 +25,12 @@ Below are some details about the different amplitude definitions in cosinor regr
 }
 
 \deqn{ 2A_{log} = log_{2}(A_{fc}) }
-\deqn{ 2A_{fc} = (1+A_{rel}) / (1-A_{rel}) = 2^{2(A_{log})} }, therefore
-\deqn{ A_{rel} = (2^{2(A_{log})}-1)/(2^{2(A_{log})}-1) }
+\deqn{ A_{fc} = (1+A_{rel}) / (1-A_{rel}) = 2^{2(A_{log})} }, therefore
+\deqn{ A_{rel} = (2^{2(A_{log})}-1)/(2^{2(A_{log})}+1) }
 }
 \examples{
 logAmp2relAmp(1:4)
+}
+\seealso{
+\code{\link[=rainAmp]{rainAmp()}}
 }

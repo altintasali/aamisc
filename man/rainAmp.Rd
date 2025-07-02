@@ -63,26 +63,28 @@ This function runs \link{rain} and calculates the amplitude and phases using \co
 ##------------------------------------------------------------------------
 ## create a circadian dataset with different noise levels
 ##------------------------------------------------------------------------
-noise.levels <- c(0, 0.02, 0.05) # range is [0,1]
+noise_levels <- c(0, 0.02, 0.05) # range is [0,1]
 timeStart <- 0
 timeEnd <- 48
 time <- timeStart:timeEnd
-amplitude <- 0.4 # this is relative amplitude
-baseline <- 1
+mesor <- 1 # baseline
+relative_amplitude <- 0.4
+amplitude <- mesor * relative_amplitude
 period <- 24
 
 ##-----------------------------------------------
 ## Linear scale
 ##-----------------------------------------------
-test_linear <- apply(matrix(noise.levels, nrow = 1), 2, function(noise){
-  timecourse = baseline + amplitude * cos((time) / period * 2 * pi) + rnorm(timeEnd, 0, noise)
+test_linear <- apply(matrix(noise_levels, nrow = 1), 2, function(noise){
+  timecourse = mesor + amplitude * cos((time) / period * 2 * pi) + rnorm(length(time), 0, noise)
 })
 colnames(test_linear) <- paste("Gene", 1:ncol(test_linear), sep = "_")
 rownames(test_linear) <- paste("Time", 1:nrow(test_linear), sep = "_")
 
+
 ## Plot the time series (linear scale)
 plot(time, test_linear[,1], xlab = "Time", ylab = "Linear Scale",
-     sub = paste("Relative amplitude is", amplitude))
+     sub = paste("Relative amplitude is", relative_amplitude))
 
 res_linear <- rainAmp(x = test_linear,
                       times = time,
@@ -92,6 +94,7 @@ res_linear <- rainAmp(x = test_linear,
                       logged = FALSE, # Note that this is linear scale
                       trend = FALSE)
 res_linear[1,]
+
 ## Note that amplitude estimation (hr.amplitude) is ~0.4, which is what we set)
 ##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
 ## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3967611 (...)
@@ -103,7 +106,7 @@ test_log2 <- log2(test_linear)
 
 ## Plot the time series (log2 scale)
 plot(time, test_log2[,1], xlab = "Time", ylab = "Log2 Scale",
-     sub = paste("Relative amplitude is", amplitude))
+     sub = paste("Relative amplitude is", relative_amplitude))
 
 res_log2 <- rainAmp(x = test_log2,
                     times = time,
@@ -117,4 +120,7 @@ res_log2[1,]
 ##      Tags         pVal phase peak.shape period     pVal.adj peak trough hr.amplitude (...)
 ## 1: Gene_1 1.022744e-45     1         12     24 3.068233e-45    2     14    0.3934892 (...)
 }
+}
+\seealso{
+\code{\link[=logAmp2relAmp]{logAmp2relAmp()}}
 }
